@@ -1,10 +1,19 @@
 package domain.fake.cardview;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by matth on 11-1-2016.
@@ -31,23 +40,118 @@ public class ListFragment extends Fragment {
         return fragment;
     }
 
+    //This RecyclerView holds the cards (receipts)
+    RecyclerView rv;
+
+    LinearLayoutManager llm = new LinearLayoutManager(getContext());
+
+    //These are the receipt previews
+    class ReceiptContent
+    {
+        String marketAndDate;
+        String marketColor; //changes the toolbar color to match branding
+        String products;
+        String prices;
+        String totalPrice;
+        int receiptId;  //this ID is used to keep track of which full receipt to open when pressed
+
+        ReceiptContent(String marketAndDate, String marketColor, String products, String prices, String totalPrice, int receiptId)
+        {
+            this.marketAndDate = marketAndDate;
+            this.marketColor = marketColor;
+            this.products = products;
+            this.prices = prices;
+            this.totalPrice = totalPrice;
+            this.receiptId = receiptId;
+        }
+    }
+
+    private static List<ReceiptContent> receipts;
+
+    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ReceiptViewHolder>{
+
+        List<ReceiptContent> receipts;
+
+        RVAdapter(List<ReceiptContent> receipts)
+        {
+            this.receipts = receipts;
+        }
+
+        @Override
+        public int getItemCount() {
+            return receipts.size();
+        }
+
+        @Override
+        public ReceiptViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.receipt_card, viewGroup, false);
+            ReceiptViewHolder rvh = new ReceiptViewHolder(v);
+            return rvh;
+        }
+
+        @Override
+        public void onBindViewHolder(ReceiptViewHolder receiptViewHolder, int i)
+        {
+            receiptViewHolder.toolbar.setTitle(receipts.get(i).marketAndDate);
+            receiptViewHolder.toolbar.setBackgroundColor(Color.parseColor(receipts.get(i).marketColor));
+            receiptViewHolder.prices.setText(receipts.get(i).prices);
+            receiptViewHolder.products.setText(receipts.get(i).products);
+        }
+
+        @Override
+        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
+        }
+
+        public class ReceiptViewHolder extends RecyclerView.ViewHolder {
+            CardView cv;
+            Toolbar toolbar;
+            TextView products;
+            TextView prices;
+            //TextView totalPrice;
+
+            ReceiptViewHolder(View itemView) {
+                super(itemView);
+                cv = (CardView)itemView.findViewById(R.id.card_view);
+                toolbar = (Toolbar)cv.findViewById(R.id.toolbar);
+                products = (TextView)itemView.findViewById(R.id.products);
+                prices = (TextView)itemView.findViewById(R.id.prices);
+            }
+        }
+
+    }
+
     //This fragment holds the favourite cards
-    public static class MainFragment extends ListFragment {
+    public static class FavFragment extends ListFragment {
         public static ListFragment newInstance(int sectionNumber) {
-            ListFragment fragment = new MainFragment();
+            ListFragment fragment = new FavFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
         }
 
+        private void initializeData()
+        {
+            receipts = new ArrayList<>();
+            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            rv = (RecyclerView)rootView.findViewById(R.id.cardList);
+            rv.setHasFixedSize(true);
+            rv.setLayoutManager(llm);
+            initializeData();
+            RVAdapter adapter = new RVAdapter(receipts);
+            rv.setAdapter(adapter);
             return rootView;
         }
     }
+
 
     //This fragment holds all cards
     public static class AllFragment extends ListFragment {
@@ -59,10 +163,26 @@ public class ListFragment extends Fragment {
             return fragment;
         }
 
+        private void initializeData()
+        {
+            receipts = new ArrayList<>();
+            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2009", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_all, container, false);
+            rv = (RecyclerView)rootView.findViewById(R.id.cardList);
+            rv.setHasFixedSize(true);
+            rv.setLayoutManager(llm);
+            initializeData();
+            RVAdapter adapter = new RVAdapter(receipts);
+            rv.setAdapter(adapter);
             return rootView;
         }
     }
