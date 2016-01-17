@@ -2,12 +2,16 @@ package domain.fake.cardview;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.MenuRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -52,16 +56,16 @@ public class ListFragment extends Fragment {
         String marketColor; //changes the toolbar color to match branding
         String products;
         String prices;
-        String totalPrice;
+        String totalprice;
         int receiptId;  //this ID is used to keep track of which full receipt to open when pressed
 
-        ReceiptContent(String marketAndDate, String marketColor, String products, String prices, String totalPrice, int receiptId)
+        ReceiptContent(String marketAndDate, String marketColor, String products, String prices, String totalprice, int receiptId)
         {
             this.marketAndDate = marketAndDate;
             this.marketColor = marketColor;
             this.products = products;
             this.prices = prices;
-            this.totalPrice = totalPrice;
+            this.totalprice = totalprice;
             this.receiptId = receiptId;
         }
     }
@@ -96,6 +100,7 @@ public class ListFragment extends Fragment {
             receiptViewHolder.toolbar.setBackgroundColor(Color.parseColor(receipts.get(i).marketColor));
             receiptViewHolder.prices.setText(receipts.get(i).prices);
             receiptViewHolder.products.setText(receipts.get(i).products);
+            receiptViewHolder.totalprice.setText(receipts.get(i).totalprice);
         }
 
         @Override
@@ -108,7 +113,7 @@ public class ListFragment extends Fragment {
             Toolbar toolbar;
             TextView products;
             TextView prices;
-            //TextView totalPrice;
+            TextView totalprice;
 
             ReceiptViewHolder(View itemView) {
                 super(itemView);
@@ -116,6 +121,7 @@ public class ListFragment extends Fragment {
                 toolbar = (Toolbar)cv.findViewById(R.id.toolbar);
                 products = (TextView)itemView.findViewById(R.id.products);
                 prices = (TextView)itemView.findViewById(R.id.prices);
+                totalprice = (TextView)itemView.findViewById(R.id.totalprice);
             }
         }
 
@@ -168,8 +174,8 @@ public class ListFragment extends Fragment {
             receipts = new ArrayList<>();
             receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
             receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€90,00", 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€80,00", 0));
             receipts.add(new ReceiptContent("AH\t01-01-2009", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
         }
 

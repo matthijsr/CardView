@@ -8,4 +8,11 @@
     <string name="all_section">ALL</string>
     <string name="products">2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF</string>
     <string name="prices">€2,33\n€3,75\n€11,22\n€13,77</string>
+    <string name="totalprice">€100,00</string>
+    <string name="prices_rest">€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77\n€2,33\n€3,75\n€11,22\n€13,77</string>
+    <string name="products_rest">2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF\n2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF</string>
+    <string name="action_search">Search</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_delete">Delete</string>
 </resources>
