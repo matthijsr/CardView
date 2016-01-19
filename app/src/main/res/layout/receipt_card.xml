@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="5dp">
+    app:cardCornerRadius="5dp"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
@@ -73,7 +75,7 @@
         <TextView
             android:id="@+id/products_rest"
             app:layout_widthPercent="70%"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_below="@+id/products"
             android:paddingBottom="8dp"
             android:paddingTop="0dp"
@@ -88,7 +90,7 @@
         <TextView
             android:id="@+id/prices_rest"
             app:layout_widthPercent="30%"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_toRightOf="@+id/products_rest"
             android:layout_below="@+id/prices"
             android:paddingBottom="8dp"
@@ -113,23 +115,30 @@
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/action_edit"
                 android:src="@drawable/ic_mode_edit_24dp"
-                android:background="?android:selectableItemBackground"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:theme="@style/AppTheme"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_height="48dp"
+                android:layout_width="48dp"
+                android:layout_gravity="right"
                 android:title="@string/action_edit" />
-            <android.support.v7.widget.AppCompatImageButton
+            <android.support.v7.widget.AppCompatCheckBox
                 android:id="@+id/action_favorite"
-                android:src="@drawable/ic_favorite_outline_24dp"
-                android:background="?android:selectableItemBackground"
+                android:button="@drawable/favorite_state"
+                android:theme="@style/AppTheme"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_margin="12dp"
+                android:layout_gravity="right"
                 android:title="@string/action_favorite" />
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/action_delete"
                 android:src="@drawable/ic_delete_24dp"
-                android:background="?android:selectableItemBackground"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:theme="@style/AppTheme"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_height="48dp"
+                android:layout_width="48dp"
+                android:layout_gravity="right"
                 android:title="@string/action_delete" />
 
         </android.support.v7.widget.Toolbar>

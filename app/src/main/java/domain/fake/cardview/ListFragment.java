@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -57,15 +58,17 @@ public class ListFragment extends Fragment {
         String products;
         String prices;
         String totalprice;
+        boolean isFavorite;
         int receiptId;  //this ID is used to keep track of which full receipt to open when pressed
 
-        ReceiptContent(String marketAndDate, String marketColor, String products, String prices, String totalprice, int receiptId)
+        ReceiptContent(String marketAndDate, String marketColor, String products, String prices, String totalprice, boolean isFavorite, int receiptId)
         {
             this.marketAndDate = marketAndDate;
             this.marketColor = marketColor;
             this.products = products;
             this.prices = prices;
             this.totalprice = totalprice;
+            this.isFavorite = isFavorite;
             this.receiptId = receiptId;
         }
     }
@@ -101,6 +104,7 @@ public class ListFragment extends Fragment {
             receiptViewHolder.prices.setText(receipts.get(i).prices);
             receiptViewHolder.products.setText(receipts.get(i).products);
             receiptViewHolder.totalprice.setText(receipts.get(i).totalprice);
+            receiptViewHolder.favorite.setChecked(receipts.get(i).isFavorite);
         }
 
         @Override
@@ -114,6 +118,7 @@ public class ListFragment extends Fragment {
             TextView products;
             TextView prices;
             TextView totalprice;
+            CheckBox favorite;
 
             ReceiptViewHolder(View itemView) {
                 super(itemView);
@@ -122,6 +127,7 @@ public class ListFragment extends Fragment {
                 products = (TextView)itemView.findViewById(R.id.products);
                 prices = (TextView)itemView.findViewById(R.id.prices);
                 totalprice = (TextView)itemView.findViewById(R.id.totalprice);
+                favorite = (CheckBox)itemView.findViewById(R.id.action_favorite);
             }
         }
 
@@ -140,8 +146,8 @@ public class ListFragment extends Fragment {
         private void initializeData()
         {
             receipts = new ArrayList<>();
-            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
-            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
+            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
         }
 
         @Override
@@ -172,11 +178,11 @@ public class ListFragment extends Fragment {
         private void initializeData()
         {
             receipts = new ArrayList<>();
-            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
-            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€90,00", 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€80,00", 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2009", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
+            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€90,00", false, 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€80,00", false, 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2009", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", false, 0));
         }
 
         @Override
