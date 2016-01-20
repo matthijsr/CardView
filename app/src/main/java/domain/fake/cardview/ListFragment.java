@@ -15,7 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,10 +80,17 @@ public class ListFragment extends Fragment {
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ReceiptViewHolder>{
 
         List<ReceiptContent> receipts;
+        boolean isFavoriteList;
 
         RVAdapter(List<ReceiptContent> receipts)
         {
             this.receipts = receipts;
+        }
+
+        RVAdapter(List<ReceiptContent> receipts, boolean isFavoriteList)
+        {
+            this.receipts = receipts;
+            this.isFavoriteList = isFavoriteList;
         }
 
         @Override
@@ -112,13 +121,15 @@ public class ListFragment extends Fragment {
             super.onAttachedToRecyclerView(recyclerView);
         }
 
-        public class ReceiptViewHolder extends RecyclerView.ViewHolder {
+        public class ReceiptViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
             CardView cv;
             Toolbar toolbar;
             TextView products;
             TextView prices;
             TextView totalprice;
             CheckBox favorite;
+            ImageButton edit;
+            ImageButton delete;
 
             ReceiptViewHolder(View itemView) {
                 super(itemView);
@@ -128,9 +139,69 @@ public class ListFragment extends Fragment {
                 prices = (TextView)itemView.findViewById(R.id.prices);
                 totalprice = (TextView)itemView.findViewById(R.id.totalprice);
                 favorite = (CheckBox)itemView.findViewById(R.id.action_favorite);
+                edit = (ImageButton)itemView.findViewById(R.id.action_edit);
+                delete = (ImageButton)itemView.findViewById(R.id.action_delete);
+                itemView.setOnClickListener(this);
+                favorite.setOnClickListener(this);
+                edit.setOnClickListener(this);
+                delete.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v)
+            {
+                //if else because cases require constants
+                if (v.getId() == itemView.getId()){
+                    openDetailedView();
+                } else if (v.getId() == favorite.getId()){
+                    favReceipt(getAdapterPosition());
+                } else if (v.getId() == edit.getId()){
+                    editReceipt();
+                } else if (v.getId() == delete.getId()){
+                    deleteReceipt(getAdapterPosition());
+                }
+            }
+
+            public void openDetailedView()
+            {
+                Toast.makeText(itemView.getContext(), "OPEN CARD", Toast.LENGTH_SHORT).show();
+            }
+
+            public void favReceipt(int position)
+            {
+                Toast.makeText(itemView.getContext(), "FAVORITE", Toast.LENGTH_SHORT).show();
+                if(isFavoriteList)
+                {
+                    receipts.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, getItemCount());
+                    //update database with isFavorite = false
+                }
+                else if(receipts.get(position).isFavorite)
+                {
+                    //update database with isFavorite = false
+                }
+                else
+                {
+                    //update database with isFavorite = true
+                }
+            }
+
+            public void editReceipt()
+            {
+                Toast.makeText(itemView.getContext(), "EDIT", Toast.LENGTH_SHORT).show();
+                //start edit activity
+            }
+
+            public void deleteReceipt(int position)
+            {
+                Toast.makeText(itemView.getContext(), "DELETE", Toast.LENGTH_SHORT).show();
+                receipts.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, getItemCount());
+                //update database
             }
         }
-
     }
 
     //This fragment holds the favourite cards
@@ -158,7 +229,7 @@ public class ListFragment extends Fragment {
             rv.setHasFixedSize(true);
             rv.setLayoutManager(llm);
             initializeData();
-            RVAdapter adapter = new RVAdapter(receipts);
+            RVAdapter adapter = new RVAdapter(receipts, true);
             rv.setAdapter(adapter);
             return rootView;
         }

@@ -139,7 +139,7 @@
                 android:layout_height="48dp"
                 android:layout_width="48dp"
                 android:layout_gravity="right"
-                android:title="@string/action_delete" />
+                android:title="@string/action_delete"/>
 
         </android.support.v7.widget.Toolbar>
 
