@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    private ListFragment.AllFragment allFrag;
+    private ListFragment.FavFragment favFrag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +125,23 @@ public class MainActivity extends AppCompatActivity {
                     return getString(R.string.all_section);
             }
             return null;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+            // save the appropriate reference depending on position
+            switch (position) {
+                case 0:
+                    favFrag = (ListFragment.FavFragment) createdFragment;
+                    break;
+                case 1:
+                    allFrag = (ListFragment.AllFragment) createdFragment;
+                    allFrag.setOtherFrag(favFrag);
+                    favFrag.setOtherFrag(allFrag);
+                    break;
+            }
+            return createdFragment;
         }
     }
 }

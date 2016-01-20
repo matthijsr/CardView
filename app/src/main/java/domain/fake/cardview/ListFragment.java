@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.MenuRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,8 +48,16 @@ public class ListFragment extends Fragment {
         return fragment;
     }
 
+    private ListFragment otherFrag;
+
+    public void setOtherFrag(ListFragment frag)
+    {
+        otherFrag = frag;
+    }
+
     //This RecyclerView holds the cards (receipts)
     RecyclerView rv;
+    RVAdapter adapter;
 
     LinearLayoutManager llm = new LinearLayoutManager(getContext());
 
@@ -73,14 +82,22 @@ public class ListFragment extends Fragment {
             this.isFavorite = isFavorite;
             this.receiptId = receiptId;
         }
+
+        boolean checkId(int iD)
+        {
+            if(iD==receiptId)
+                return true;
+            else
+                return false;
+        }
     }
 
     private static List<ReceiptContent> receipts;
 
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ReceiptViewHolder>{
 
-        List<ReceiptContent> receipts;
-        boolean isFavoriteList;
+        public List<ReceiptContent> receipts;
+        boolean isFavoriteList = false;
 
         RVAdapter(List<ReceiptContent> receipts)
         {
@@ -170,19 +187,26 @@ public class ListFragment extends Fragment {
             public void favReceipt(int position)
             {
                 Toast.makeText(itemView.getContext(), "FAVORITE", Toast.LENGTH_SHORT).show();
-                if(isFavoriteList)
+                if(isFavoriteList)  //removes from fav list, changes checkbox in all list
                 {
+                    favOtherList(receipts.get(position).receiptId, position, isFavoriteList);
                     receipts.remove(position);
                     notifyItemRemoved(position);
                     notifyItemRangeChanged(position, getItemCount());
                     //update database with isFavorite = false
                 }
-                else if(receipts.get(position).isFavorite)
+                else if(receipts.get(position).isFavorite)  //removes from fav list (other screen), updates view
                 {
+                    delOtherList(receipts.get(position).receiptId);
+                    receipts.get(position).isFavorite=false;
+                    notifyDataSetChanged();
                     //update database with isFavorite = false
                 }
-                else
+                else    //adds to fav list, updates view
                 {
+                    receipts.get(position).isFavorite=true;
+                    favOtherList(receipts.get(position).receiptId, position, isFavoriteList);
+                    notifyDataSetChanged();
                     //update database with isFavorite = true
                 }
             }
@@ -196,11 +220,54 @@ public class ListFragment extends Fragment {
             public void deleteReceipt(int position)
             {
                 Toast.makeText(itemView.getContext(), "DELETE", Toast.LENGTH_SHORT).show();
+                delOtherList(receipts.get(position).receiptId);
                 receipts.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, getItemCount());
                 //update database
             }
+        }
+    }
+
+    public void favOtherList(int receiptId, int currentPosition, boolean isFavoriteList)
+    {
+        if(isFavoriteList)
+        {
+            int position = -1;
+            RVAdapter otherAdapter = otherFrag.adapter;
+            for(int i = 0; i < otherAdapter.receipts.size(); i++)
+            {
+                if(otherAdapter.receipts.get(i).checkId(receiptId))
+                    position = i;
+            }
+            if(position>-1)
+            {
+                otherAdapter.receipts.get(position).isFavorite=false;
+                otherAdapter.notifyDataSetChanged();
+            }
+        }
+        else
+        {
+            RVAdapter otherAdapter = otherFrag.adapter;
+            otherAdapter.receipts.add(0, adapter.receipts.get(currentPosition));
+            otherAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void delOtherList(int receiptId)
+    {
+        int position = -1;
+        RVAdapter otherAdapter = otherFrag.adapter;
+        for(int i = 0; i < otherAdapter.receipts.size(); i++)
+        {
+            if(otherAdapter.receipts.get(i).checkId(receiptId))
+                position = i;
+        }
+        if(position>-1)
+        {
+            otherAdapter.receipts.remove(position);
+            otherAdapter.notifyItemRemoved(position);
+            otherAdapter.notifyItemRangeChanged(position, adapter.getItemCount());
         }
     }
 
@@ -217,8 +284,8 @@ public class ListFragment extends Fragment {
         private void initializeData()
         {
             receipts = new ArrayList<>();
-            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
-            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 22));
+            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 50));
         }
 
         @Override
@@ -229,7 +296,7 @@ public class ListFragment extends Fragment {
             rv.setHasFixedSize(true);
             rv.setLayoutManager(llm);
             initializeData();
-            RVAdapter adapter = new RVAdapter(receipts, true);
+            adapter = new RVAdapter(receipts, true);
             rv.setAdapter(adapter);
             return rootView;
         }
@@ -238,6 +305,7 @@ public class ListFragment extends Fragment {
 
     //This fragment holds all cards
     public static class AllFragment extends ListFragment {
+
         public static ListFragment newInstance(int sectionNumber) {
             ListFragment fragment = new AllFragment();
             Bundle args = new Bundle();
@@ -249,11 +317,11 @@ public class ListFragment extends Fragment {
         private void initializeData()
         {
             receipts = new ArrayList<>();
-            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
-            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€90,00", false, 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€80,00", false, 0));
-            receipts.add(new ReceiptContent("AH\t01-01-2009", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", false, 0));
+            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 22));
+            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 50));
+            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€90,00", false, 100));
+            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€80,00", false, 33));
+            receipts.add(new ReceiptContent("AH\t01-01-2009", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", false, 12));
         }
 
         @Override
@@ -264,7 +332,7 @@ public class ListFragment extends Fragment {
             rv.setHasFixedSize(true);
             rv.setLayoutManager(llm);
             initializeData();
-            RVAdapter adapter = new RVAdapter(receipts);
+            adapter = new RVAdapter(receipts);
             rv.setAdapter(adapter);
             return rootView;
         }
