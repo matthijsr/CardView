@@ -250,14 +250,31 @@ public class ListFragment extends Fragment {
                 //start edit activity
             }
 
-            public void deleteReceipt(int position)
+            public void deleteReceipt(final int position)
             {
-                Toast.makeText(itemView.getContext(), "DELETE", Toast.LENGTH_SHORT).show();
-                delOtherList(receipts.get(position).receiptId);
+                final ReceiptContent receiptBackup = receipts.get(position);
+
+                final int otherListPosition = delOtherList(receipts.get(position).receiptId);
                 receipts.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, getItemCount());
+
                 //update database
+
+                Snackbar snackbar = Snackbar
+                        .make(itemView, "PHOTO REMOVED", Snackbar.LENGTH_LONG)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                receipts.add(position, receiptBackup);
+                                notifyItemInserted(position);
+                                rv.scrollToPosition(position);
+                                if(otherListPosition!=-1)
+                                    undoOtherList(otherListPosition, receiptBackup);
+                                //update database again
+                            }
+                        });
+                snackbar.show();
             }
         }
     }
@@ -287,7 +304,7 @@ public class ListFragment extends Fragment {
         }
     }
 
-    public void delOtherList(int receiptId)
+    public int delOtherList(int receiptId)
     {
         int position = -1;
         RVAdapter otherAdapter = otherFrag.adapter;
@@ -302,6 +319,14 @@ public class ListFragment extends Fragment {
             otherAdapter.notifyItemRemoved(position);
             otherAdapter.notifyItemRangeChanged(position, adapter.getItemCount());
         }
+        return position;
+    }
+
+    public void undoOtherList(int position, ReceiptContent receiptBackup)
+    {
+        RVAdapter otherAdapter = otherFrag.adapter;
+        otherAdapter.receipts.add(position, receiptBackup);
+        otherAdapter.notifyDataSetChanged();
     }
 
     //This fragment holds the favourite cards
