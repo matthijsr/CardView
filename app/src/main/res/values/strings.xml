@@ -15,4 +15,8 @@
     <string name="action_edit">Edit</string>
     <string name="action_favorite">Favorite</string>
     <string name="action_delete">Delete</string>
+    <string name="deleted">REMOVED</string>
+    <string name="undo">UNDO</string>
+    <string name="search_hint">Appels...</string>
+    <string name="search_results">Search Results</string>
 </resources>

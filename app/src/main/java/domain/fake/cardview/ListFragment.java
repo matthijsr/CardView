@@ -128,6 +128,66 @@ public class ListFragment extends Fragment{
         }
     }
 
+
+    public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
+        // The minimum amount of items to have below your current scroll position
+        // before loading more.
+        private int visibleThreshold = 3;
+        // The current offset index of data you have loaded
+        private int currentPage = 0;
+        // The total number of items in the dataset after the last load
+        private int previousTotalItemCount = 0;
+        // True if we are still waiting for the last set of data to load.
+        private boolean loading = true;
+        // Sets the starting page index
+        private int startingPageIndex = 0;
+
+        private LinearLayoutManager mLinearLayoutManager;
+
+        public EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+            this.mLinearLayoutManager = layoutManager;
+        }
+
+        // This happens many times a second during a scroll, so be wary of the code you place here.
+        // We are given a few useful parameters to help us work out if we need to load some more data,
+        // but first we check if we are waiting for the previous load to finish.
+        @Override
+        public void onScrolled(RecyclerView view, int dx, int dy) {
+            int lastVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition();
+            int totalItemCount = mLinearLayoutManager.getItemCount();
+
+            // If the total item count is zero and the previous isn't, assume the
+            // list is invalidated and should be reset back to initial state
+            if (totalItemCount < previousTotalItemCount) {
+                this.currentPage = this.startingPageIndex;
+                this.previousTotalItemCount = totalItemCount;
+                if (totalItemCount == 0) {
+                    this.loading = true;
+                }
+            }
+            // If it’s still loading, we check to see if the dataset count has
+            // changed, if so we conclude it has finished loading and update the current page
+            // number and total item count.
+            if (loading && (totalItemCount > previousTotalItemCount)) {
+                loading = false;
+                previousTotalItemCount = totalItemCount;
+            }
+
+            // If it isn’t currently loading, we check to see if we have breached
+            // the visibleThreshold and need to reload more data.
+            // If we do need to reload some more data, we execute onLoadMore to fetch the data.
+            if (!loading && (lastVisibleItemPosition + visibleThreshold) >= totalItemCount) {
+                currentPage++;
+                onLoadMore(currentPage, totalItemCount);
+                loading = true;
+            }
+        }
+
+        // Defines the process for actually loading more data based on page
+        public abstract void onLoadMore(int page, int totalItemsCount);
+
+    }
+
     private static List<ReceiptContent> receipts;
 
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ReceiptViewHolder>{
@@ -138,6 +198,11 @@ public class ListFragment extends Fragment{
         RVAdapter(List<ReceiptContent> receipts)
         {
             this.receipts = receipts;
+        }
+
+        public void addReceipts(List<ReceiptContent> newReceipts)
+        {
+            receipts.addAll(newReceipts);
         }
 
         RVAdapter(List<ReceiptContent> receipts, boolean isFavoriteList)
@@ -276,8 +341,8 @@ public class ListFragment extends Fragment{
                 //update database
 
                 Snackbar snackbar = Snackbar
-                        .make(itemView, "PHOTO REMOVED", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO", new View.OnClickListener() {
+                        .make(itemView, R.string.deleted, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.undo, new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 receipts.add(position, receiptBackup);
@@ -364,14 +429,14 @@ public class ListFragment extends Fragment{
                 gradientCutoff.setVisibility(View.VISIBLE);
                 PercentRelativeLayout.LayoutParams paramsTotalPrice = (PercentRelativeLayout.LayoutParams)totalPrice.getLayoutParams();
                 paramsTotalPrice.addRule(PercentRelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                rv.scrollToPosition(receiptViewHolder.getAdapterPosition());
             }
         }
     }
 
     public void favOtherList(int receiptId, int currentPosition, boolean isFavoriteList)
     {
-        if(isFavoriteList)
-        {
+        if(isFavoriteList) {
             int position = -1;
             RVAdapter otherAdapter = otherFrag.adapter;
             for(int i = 0; i < otherAdapter.receipts.size(); i++)
@@ -445,7 +510,28 @@ public class ListFragment extends Fragment{
             initializeData();
             adapter = new RVAdapter(receipts, true);
             rv.setAdapter(adapter);
+            rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(llm) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    // fetch data asynchronously here
+                    loadMore(page);
+                }
+            });
             return rootView;
+        }
+
+        public void loadMore(int offset) {
+            int curSize = adapter.getItemCount();
+            List<ReceiptContent> moreReceipts;
+            moreReceipts = new ArrayList<>();
+            //add a certain number of receipts (use page to determine the range, or I guess the key would be better
+            if(offset<13) //this isn't relevant, just a useful limiter
+            {
+                moreReceipts.add(new ReceiptContent("DerpMarkt", "01-01-2009", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 12));
+            }
+            //normally you'd be pulling from the database at this point, note to only pull favorites
+            adapter.addReceipts(moreReceipts);
+            adapter.notifyItemRangeInserted(curSize, receipts.size() - 1);
         }
     }
 
@@ -481,7 +567,28 @@ public class ListFragment extends Fragment{
             initializeData();
             adapter = new RVAdapter(receipts);
             rv.setAdapter(adapter);
+            rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(llm) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    // fetch data asynchronously here
+                    loadMore(page);
+                }
+            });
             return rootView;
+        }
+
+        public void loadMore(int offset) {
+            int curSize = adapter.getItemCount();
+            List<ReceiptContent> moreReceipts;
+            moreReceipts = new ArrayList<>();
+            //add a certain number of receipts (use page to determine the range, or I guess the key would be better
+            if(offset<13) //this isn't relevant, just a useful limiter
+            {
+                moreReceipts.add(new ReceiptContent("DerpMarkt", "01-01-2009", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 12));
+            }
+            //normally you'd be pulling from the database at this point
+            adapter.addReceipts(moreReceipts);
+            adapter.notifyItemRangeInserted(curSize, receipts.size() - 1);
         }
     }
 }
