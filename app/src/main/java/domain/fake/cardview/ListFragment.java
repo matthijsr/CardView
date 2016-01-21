@@ -2,10 +2,12 @@ package domain.fake.cardview;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.annotation.MenuRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -64,23 +66,54 @@ public class ListFragment extends Fragment {
     //These are the receipt previews
     class ReceiptContent
     {
-        String marketAndDate;
-        String marketColor; //changes the toolbar color to match branding
+        String market;
+        String date; //changes the toolbar color to match branding
+        int marketColor;
         String products;
         String prices;
         String totalprice;
         boolean isFavorite;
         int receiptId;  //this ID is used to keep track of which full receipt to open when pressed
 
-        ReceiptContent(String marketAndDate, String marketColor, String products, String prices, String totalprice, boolean isFavorite, int receiptId)
+        ReceiptContent(String market, String date, String products, String prices, String totalprice, boolean isFavorite, int receiptId)
         {
-            this.marketAndDate = marketAndDate;
-            this.marketColor = marketColor;
+            this.market = market;
+            this.date = date;
+            marketColor = getMarketColor(market);
             this.products = products;
             this.prices = prices;
             this.totalprice = totalprice;
             this.isFavorite = isFavorite;
             this.receiptId = receiptId;
+        }
+
+        int getMarketColor(String market)
+        {
+            switch(market)
+            {
+                case "AH":
+                    return ContextCompat.getColor(getContext(), R.color.AH);
+                case "Albert Heijn":
+                    return ContextCompat.getColor(getContext(), R.color.AH);
+                case "Jumbo":
+                    return ContextCompat.getColor(getContext(), R.color.Jumbo);
+                case "Aldi":
+                    return ContextCompat.getColor(getContext(), R.color.Aldi);
+                case "Plus":
+                    return ContextCompat.getColor(getContext(), R.color.Plus);
+                case "Spar":
+                    return ContextCompat.getColor(getContext(), R.color.Spar);
+                case "Lidl":
+                    return ContextCompat.getColor(getContext(), R.color.Lidl);
+                case "Dirk":
+                    return ContextCompat.getColor(getContext(), R.color.Dirk);
+                case "Makro":
+                    return ContextCompat.getColor(getContext(), R.color.Makro);
+                case "Sligro":
+                    return ContextCompat.getColor(getContext(), R.color.Sligro);
+                default:
+                    return ContextCompat.getColor(getContext(), R.color.Default);
+            }
         }
 
         boolean checkId(int iD)
@@ -125,8 +158,8 @@ public class ListFragment extends Fragment {
         @Override
         public void onBindViewHolder(ReceiptViewHolder receiptViewHolder, int i)
         {
-            receiptViewHolder.toolbar.setTitle(receipts.get(i).marketAndDate);
-            receiptViewHolder.toolbar.setBackgroundColor(Color.parseColor(receipts.get(i).marketColor));
+            receiptViewHolder.toolbar.setTitle(receipts.get(i).market.concat("\t").concat(receipts.get(i).date));
+            receiptViewHolder.toolbar.setBackgroundColor(receipts.get(i).marketColor);
             receiptViewHolder.prices.setText(receipts.get(i).prices);
             receiptViewHolder.products.setText(receipts.get(i).products);
             receiptViewHolder.totalprice.setText(receipts.get(i).totalprice);
@@ -284,8 +317,8 @@ public class ListFragment extends Fragment {
         private void initializeData()
         {
             receipts = new ArrayList<>();
-            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 22));
-            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 50));
+            receipts.add(new ReceiptContent("AH", "01-01-2021", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 22));
+            receipts.add(new ReceiptContent("Jumbo", "18-06-2011", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 50));
         }
 
         @Override
@@ -317,11 +350,11 @@ public class ListFragment extends Fragment {
         private void initializeData()
         {
             receipts = new ArrayList<>();
-            receipts.add(new ReceiptContent("AH\t01-01-2021", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 22));
-            receipts.add(new ReceiptContent("Jumbo\t18-06-2011", "#FFFF00", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 50));
-            receipts.add(new ReceiptContent("AH\t01-01-2011", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€90,00", false, 100));
-            receipts.add(new ReceiptContent("AH\t01-01-2010", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€80,00", false, 33));
-            receipts.add(new ReceiptContent("AH\t01-01-2009", "#00A0E2", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", false, 12));
+            receipts.add(new ReceiptContent("AH", "01-01-2021", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 22));
+            receipts.add(new ReceiptContent("Jumbo", "18-06-2011", "2x FANTA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", true, 50));
+            receipts.add(new ReceiptContent("Spar", "01-01-2011", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€90,00", false, 100));
+            receipts.add(new ReceiptContent("Dirk", "01-01-2010", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€80,00", false, 33));
+            receipts.add(new ReceiptContent("DerpMarkt", "01-01-2009", "2x COCA-COLA\n2x APPELS\n1x DURR\n1x CUTOFF", "€2,33\n€3,75\n€11,22\n€13,77", "€100,00", false, 12));
         }
 
         @Override
