@@ -1,10 +1,12 @@
 package domain.fake.cardview;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
 import android.support.annotation.MenuRes;
 import android.support.design.widget.Snackbar;
+import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +31,7 @@ import java.util.List;
 /**
  * Created by matth on 11-1-2016.
  */
-public class ListFragment extends Fragment {
+public class ListFragment extends Fragment{
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -180,6 +183,7 @@ public class ListFragment extends Fragment {
             CheckBox favorite;
             ImageButton edit;
             ImageButton delete;
+            FullReceipt fullReceipt;
 
             ReceiptViewHolder(View itemView) {
                 super(itemView);
@@ -214,7 +218,17 @@ public class ListFragment extends Fragment {
 
             public void openDetailedView()
             {
-                Toast.makeText(itemView.getContext(), "OPEN CARD", Toast.LENGTH_SHORT).show();
+                if(fullReceipt==null)
+                {
+                    fullReceipt = new FullReceipt(this, receipts.get(getAdapterPosition()).receiptId);
+                    fullReceipt.expand();
+                }
+                else
+                {
+                    fullReceipt.goBack();
+                    fullReceipt = null;
+                }
+
             }
 
             public void favReceipt(int position)
@@ -275,6 +289,81 @@ public class ListFragment extends Fragment {
                             }
                         });
                 snackbar.show();
+            }
+        }
+
+        public class FullReceipt
+        {
+            int receiptId;
+            CardView cv;
+            TextView productsRest;
+            TextView pricesRest;
+            TextView totalPrice;
+            ImageView gradientCutoff;
+            Toolbar bottomToolbar;
+            ReceiptViewHolder receiptViewHolder;
+
+            FullReceipt(ReceiptViewHolder rvh, int receiptId) {
+                cv = rvh.cv;
+                receiptViewHolder = rvh;
+                productsRest = (TextView)cv.findViewById(R.id.products_rest);
+                pricesRest = (TextView)cv.findViewById(R.id.prices_rest);
+                bottomToolbar = (Toolbar)cv.findViewById(R.id.toolbar_bottom);
+                gradientCutoff = (ImageView)cv.findViewById(R.id.imageView);
+                totalPrice = (TextView)cv.findViewById(R.id.totalprice);
+                productsRest.setText(getRestProducts());
+                pricesRest.setText(getRestPrices());
+            }
+
+            String getRestProducts()
+            {
+                String restProducts = getString(R.string.products_rest); //REPLACE WITH DATABASE QUERY
+                return restProducts;
+            }
+
+            String getRestPrices()
+            {
+                String restPrices = getString(R.string.prices_rest); //REPLACE WITH DATABASE QUERY
+                return restPrices;
+            }
+
+            public void expand()
+            {
+                //set text views as visible and wrapping
+                ViewGroup.LayoutParams paramsProducts = productsRest.getLayoutParams();
+                paramsProducts.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                productsRest.setLayoutParams(paramsProducts);
+                ViewGroup.LayoutParams paramsPrices = pricesRest.getLayoutParams();
+                paramsPrices.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                pricesRest.setLayoutParams(paramsPrices);
+                productsRest.setVisibility(View.VISIBLE);
+                pricesRest.setVisibility(View.VISIBLE);
+                //remove bottom bar
+                bottomToolbar.setVisibility(View.GONE);
+                //remove gradient cutoff
+                gradientCutoff.setVisibility(View.GONE);
+                //put total price below prices
+                PercentRelativeLayout.LayoutParams paramsTotalPrice = (PercentRelativeLayout.LayoutParams)totalPrice.getLayoutParams();
+                paramsTotalPrice.addRule(PercentRelativeLayout.ALIGN_PARENT_BOTTOM);
+                //enable back button
+            }
+
+            public void goBack()
+            {
+                productsRest.setText("");
+                pricesRest.setText("");
+                ViewGroup.LayoutParams paramsProducts = productsRest.getLayoutParams();
+                paramsProducts.height = 0;
+                productsRest.setLayoutParams(paramsProducts);
+                ViewGroup.LayoutParams paramsPrices = pricesRest.getLayoutParams();
+                paramsPrices.height = 0;
+                pricesRest.setLayoutParams(paramsPrices);
+                productsRest.setVisibility(View.GONE);
+                pricesRest.setVisibility(View.GONE);
+                bottomToolbar.setVisibility(View.VISIBLE);
+                gradientCutoff.setVisibility(View.VISIBLE);
+                PercentRelativeLayout.LayoutParams paramsTotalPrice = (PercentRelativeLayout.LayoutParams)totalPrice.getLayoutParams();
+                paramsTotalPrice.addRule(PercentRelativeLayout.ALIGN_PARENT_BOTTOM, 0);
             }
         }
     }
