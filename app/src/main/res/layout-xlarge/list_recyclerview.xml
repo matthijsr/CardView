@@ -7,11 +7,24 @@
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context=".MyActivity">
+    tools:context=".MyActivity"
+    android:animateLayoutChanges="true">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cardList"
         app:layout_marginLeftPercent="20%"
         app:layout_widthPercent="60%"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <android.support.v4.widget.ContentLoadingProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/cardList"
+        android:layout_alignEnd="@+id/cardList" />
 </android.support.percent.PercentRelativeLayout>
